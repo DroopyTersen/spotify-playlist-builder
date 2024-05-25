@@ -1,4 +1,7 @@
-import type { MetaFunction } from "@remix-run/node";
+import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
+import { useLoaderData } from "@remix-run/react";
+import { authenticator, requireAuth } from "~/auth/auth.server";
+import { getRecentlyPlayed } from "~/spotify/getMyRecentListens";
 
 export const meta: MetaFunction = () => {
   return [
@@ -6,14 +9,32 @@ export const meta: MetaFunction = () => {
     { name: "description", content: "Welcome to Remix!" },
   ];
 };
+export const loader = async ({ request }: LoaderFunctionArgs) => {
+  let user = await requireAuth(request);
+  console.log("🚀 | loader | user:", user);
+  let recentlyPlayed = await getRecentlyPlayed(user.accessToken!);
+  return {
+    user,
+    recentlyPlayed,
+  };
+};
 
 export default function Index() {
+  const { user, recentlyPlayed } = useLoaderData<typeof loader>();
+  console.log("🚀 | Index | user:", user);
+  console.log("🚀 | Index | recentlyPlayed:", recentlyPlayed);
   return (
-    <div style={{ fontFamily: "system-ui, sans-serif", lineHeight: "1.8" }}>
-      <h1>Welcome to Remix</h1>
+    <div className="prose">
+      <h1>Recently Played</h1>
       <ul>
+        {recentlyPlayed.items.map((item) => (
+          <li key={item.played_at}>
+            {item.track.name} by {item.track.artists[0].name}
+          </li>
+        ))}
         <li>
           <a
+            className="link link-hover link-accent"
             target="_blank"
             href="https://remix.run/tutorials/blog"
             rel="noreferrer"
