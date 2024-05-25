@@ -1,7 +1,7 @@
 import type { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { useLoaderData } from "@remix-run/react";
 import { authenticator, requireAuth } from "~/auth/auth.server";
-import { getRecentlyPlayed } from "~/spotify/getMyRecentListens";
+import { getRecentlyPlayed } from "~/spotify/getRecentlyPlayed";
 
 export const meta: MetaFunction = () => {
   return [

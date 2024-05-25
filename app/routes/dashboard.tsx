@@ -7,7 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
 import { LoaderFunctionArgs, MetaFunction } from "@remix-run/node";
 import { requireAuth } from "~/auth/auth.server";
-import { getRecentlyPlayed } from "~/spotify/getMyRecentListens";
+import { getRecentlyPlayed } from "~/spotify/getRecentlyPlayed";
 import { useLoaderData } from "@remix-run/react";
 import { AlbumArtwork } from "~/components/AlbumArtwork";
 import { Sidebar } from "~/components/Sidebar";
@@ -60,16 +60,31 @@ export default function Dashboard() {
                     <ScrollArea>
                       <div className="flex space-x-4 pb-4">
                         {recentlyPlayed.items.map((recentPlay) => (
-                          <AlbumArtwork
-                            image={recentPlay.track?.album?.images?.[0]?.url}
-                            artist={recentPlay.track?.artists?.[0]?.name}
-                            trackOrAlbum={recentPlay.track?.name}
+                          <button
                             key={recentPlay.played_at}
-                            className="w-[250px]"
-                            aspectRatio="portrait"
-                            width={250}
-                            height={330}
-                          />
+                            onClick={() => {
+                              fetch("/api/play", {
+                                method: "POST",
+                                headers: {
+                                  "Content-Type": "application/json",
+                                },
+                                body: JSON.stringify({
+                                  uri: recentPlay.track.uri,
+                                }),
+                              });
+                            }}
+                          >
+                            <AlbumArtwork
+                              image={recentPlay.track?.album?.images?.[0]?.url}
+                              artist={recentPlay.track?.artists?.[0]?.name}
+                              trackOrAlbum={recentPlay.track?.name}
+                              key={recentPlay.played_at}
+                              className="w-[250px]"
+                              aspectRatio="portrait"
+                              width={250}
+                              height={330}
+                            />
+                          </button>
                         ))}
                       </div>
                       <ScrollBar orientation="horizontal" />

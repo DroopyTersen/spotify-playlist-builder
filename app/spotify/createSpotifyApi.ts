@@ -12,6 +12,17 @@ export const createSpotifyApi = (accessToken: string) => {
         },
       });
     },
+    put: async <T>(path: string, body: any) => {
+      let url = `${baseUrl}${path}`;
+      return jsonRequest<T>(url, {
+        method: "PUT",
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(body),
+      });
+    },
     post: async <T>(path: string, body: any) => {
       let url = `${baseUrl}${path}`;
       return jsonRequest<T>(url, {
